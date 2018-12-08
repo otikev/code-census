@@ -1,0 +1,3 @@
+Connects to your git account,analyses file and git history to provide interesting and cool statistics.
+
+Get notifications every time an action is performed in your codebase e.g commits, branches, tags e.t.c...
