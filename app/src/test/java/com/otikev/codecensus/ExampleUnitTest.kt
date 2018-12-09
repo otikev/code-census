@@ -1,4 +1,4 @@
-package com.otikev.codebasecensus
+package com.otikev.codecensus
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.otikev.codebasecensus
+package com.otikev.codecensus
 
 /**
  * Created by kevin on 08/12/18 at 20:20

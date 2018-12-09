@@ -1,4 +1,4 @@
-package com.otikev.codebasecensus
+package com.otikev.codecensus
 
 import android.util.Log
 import com.codebasecensus.core.*

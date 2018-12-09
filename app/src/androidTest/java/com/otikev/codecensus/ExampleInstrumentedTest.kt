@@ -1,4 +1,4 @@
-package com.otikev.codebasecensus
+package com.otikev.codecensus
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
