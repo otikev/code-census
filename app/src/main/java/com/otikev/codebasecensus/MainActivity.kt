@@ -7,56 +7,48 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.widget.TextView
 import android.widget.Toast
 import com.codebasecensus.core.*
 import java.net.URI
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MainContract.View {
 
     private val REQUEST_WRITE_STORAGE = 112
 
-    lateinit var codebaseCensus : CodebaseCensus
+    lateinit var presenter: MainContract.Presenter
+    lateinit var txtRepoName: TextView
+    lateinit var txtTotalFiles: TextView
+    lateinit var txtContributors: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-
-        if (!hasPermission) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                REQUEST_WRITE_STORAGE
-            )
-        }else{
-            clone()
-        }
+        presenter = MainPresenter(this)
+        presenter.onViewInit()
     }
 
-    fun clone(){
-        var uri : URI = URI.create("https://github.com/otikev/codebase-census.git")
+    override fun hasWriteExternalStoragePermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+    }
 
-        codebaseCensus = CodebaseCensus(GIT(uri))
-        codebaseCensus.setup(object : SetupCallback{
-            override fun setupSuccess() {
-                Log.d(javaClass.simpleName,"Setup success")
-                codebaseCensus.analizeTotalFileCount(object : AnalyzeCallback{
-                    override fun onFinished(model: ResultModel) {
-                        Log.d(javaClass.simpleName,"TOTAL FILES : "+model.count)
-                    }
+    override fun requestWriteExternalStoragePermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            REQUEST_WRITE_STORAGE
+        )
+    }
 
-                    override fun onFailure(reason: String) {
-                        Log.e(javaClass.simpleName, "Failed : $reason")
-                    }
-                })
-            }
-
-            override fun setupFailed(error: String) {
-                Log.d(javaClass.simpleName,"Setup failed")
-            }
-        })
+    override fun bindViews() {
+        txtRepoName = findViewById(R.id.txtRepoName)
+        txtTotalFiles = findViewById(R.id.txtTotalFiles)
+        txtContributors = findViewById(R.id.txtContributors)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -64,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             REQUEST_WRITE_STORAGE -> {
                 if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    clone()
+                    presenter.setup()
                 } else {
                     Toast.makeText(
                         this,
@@ -73,6 +65,24 @@ class MainActivity : AppCompatActivity() {
                     ).show()
                 }
             }
+        }
+    }
+
+    override fun setRepoName(name: String) {
+        runOnUiThread {
+            txtRepoName.text = name
+        }
+    }
+
+    override fun setTotalFiles(count: Int) {
+        runOnUiThread {
+            txtTotalFiles.text = count.toString()
+        }
+    }
+
+    override fun setContributors(count: Int) {
+        runOnUiThread {
+            txtContributors.text = count.toString()
         }
     }
 }

@@ -1,6 +1,9 @@
 package com.codebasecensus.core
 
 import java.io.File
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+
+
 
 /**
  * Created by kevin on 08/12/18 at 14:01
@@ -33,6 +36,10 @@ class CodebaseCensus(var git: GIT) : Codebase {
                 }
             })
         }
+    }
+
+    override fun contributors() {
+
     }
 
     override fun analizeTotalFileCount(callback: AnalyzeCallback) {

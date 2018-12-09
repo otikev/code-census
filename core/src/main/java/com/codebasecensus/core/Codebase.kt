@@ -7,4 +7,6 @@ interface Codebase {
     fun setup(callback: SetupCallback)
 
     fun analizeTotalFileCount(callback: AnalyzeCallback)
+
+    fun contributors()
 }
