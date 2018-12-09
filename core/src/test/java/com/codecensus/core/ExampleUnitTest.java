@@ -1,4 +1,4 @@
-package com.codebasecensus.core;
+package com.codecensus.core;
 
 import org.junit.Test;
 

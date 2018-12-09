@@ -1,7 +1,9 @@
-package com.codebasecensus.core
+package com.codecensus.core
 
 import android.os.Environment
 import android.util.Log
+import com.codecensus.core.callbacks.CloneCallback
+import com.codecensus.core.callbacks.PullCallback
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.api.errors.JGitInternalException
@@ -9,6 +11,10 @@ import org.eclipse.jgit.lib.ProgressMonitor
 import java.io.File
 import java.net.URI
 import java.util.*
+import org.eclipse.jgit.revwalk.RevCommit
+import org.eclipse.jgit.internal.storage.file.FileRepository
+
+
 
 
 /**
@@ -17,6 +23,8 @@ import java.util.*
 class GIT(var uri: URI) {
 
     var TAG : String = javaClass.simpleName
+
+    var BRANCH : String = "refs/heads/master"
 
     lateinit var git : Git
 
@@ -55,11 +63,18 @@ class GIT(var uri: URI) {
         }).start()
     }
 
-    fun cloneRepo(branch: String?, callback: CloneCallback) {
+    fun log() : Iterable<RevCommit>{
+        val repository = FileRepository(getRepoDirectory()+"/.git")
+        val treeName = BRANCH // tag or branch
+
+        return git.log().add(repository.resolve(treeName)).call()
+    }
+
+    fun cloneRepo(callback: CloneCallback) {
         try {
             Log.i(javaClass.simpleName,"Cloning into " + (uri?.toASCIIString() ?: "null!!!"))
 
-            val folder = File(uri?.let { getRepoDirectory() })
+            val folder = File(getRepoDirectory())
             folder.mkdirs()
 
             Thread(Runnable {
@@ -68,8 +83,8 @@ class GIT(var uri: URI) {
                         .setURI(uri?.toASCIIString())
                         .setDirectory(folder)
                         //.setCloneAllBranches(true)
-                        .setBranchesToClone(Arrays.asList("refs/heads/$branch"))
-                        .setBranch("refs/heads/$branch")
+                        .setBranchesToClone(Arrays.asList(BRANCH))
+                        .setBranch(BRANCH)
                         .setProgressMonitor(object : ProgressMonitor {
                             override fun start(totalTasks: Int) {
                                 Log.d(javaClass.simpleName,"start")
@@ -105,18 +120,16 @@ class GIT(var uri: URI) {
     }
 
     fun getRepoDirectory(): String {
-        return Environment.getExternalStorageDirectory().path + "/codebase-census/" + folderNameFromGitUrl(uri)
+        return Environment.getExternalStorageDirectory().path + "/codebase-census/" + folderNameFromGitUrl()
     }
 
-    private fun folderNameFromGitUrl(uri: URI): String {
+    private fun folderNameFromGitUrl(): String {
         val url = uri.toASCIIString()
 
         val exploded = url.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
         val nameWithExtension = exploded[exploded.size - 1]
 
-        var name : String = nameWithExtension.split(".")[0]
-
-        return name
+        return nameWithExtension.split(".")[0]
     }
 }

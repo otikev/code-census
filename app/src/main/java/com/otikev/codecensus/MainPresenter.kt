@@ -1,7 +1,9 @@
 package com.otikev.codecensus
 
 import android.util.Log
-import com.codebasecensus.core.*
+import com.codecensus.core.*
+import com.codecensus.core.callbacks.AnalyzeCallback
+import com.codecensus.core.callbacks.SetupCallback
 import java.net.URI
 
 /**
@@ -10,7 +12,7 @@ import java.net.URI
 class MainPresenter(var view : MainContract.View) :MainContract.Presenter {
 
     var repo : String = "https://github.com/otikev/codebase-census.git"
-    lateinit var codebaseCensus : CodebaseCensus
+    lateinit var codebaseCensus : CodeCensus
 
     override fun onViewInit() {
         view.bindViews()
@@ -27,11 +29,11 @@ class MainPresenter(var view : MainContract.View) :MainContract.Presenter {
 
         var uri : URI = URI.create(repo)
 
-        codebaseCensus = CodebaseCensus(GIT(uri))
+        codebaseCensus = CodeCensus(GIT(uri))
         codebaseCensus.setup(object : SetupCallback {
             override fun setupSuccess() {
                 Log.d(javaClass.simpleName,"Setup success")
-                codebaseCensus.analizeTotalFileCount(object : AnalyzeCallback {
+                codebaseCensus.analyzeTotalFileCount(object : AnalyzeCallback {
                     override fun onFinished(model: ResultModel) {
                         view.setTotalFiles(model.count)
                         Log.d(javaClass.simpleName,"TOTAL FILES : "+model.count)
