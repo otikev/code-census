@@ -77,7 +77,7 @@ class RepoAdapter(val context: Context, val mDataset: ArrayList<RepoItem>) :
             // Reset viewport height range to (0,100)
             val v = Viewport(chart.maximumViewport)
             v.bottom = 0f
-            v.top = highest
+            v.top = highest+1
             v.left = 0f
             v.right = (trend.trend.size - 1).toFloat()
             chart.maximumViewport = v
