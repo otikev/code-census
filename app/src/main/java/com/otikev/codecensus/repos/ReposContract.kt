@@ -1,20 +1,18 @@
-package com.otikev.codecensus
+package com.otikev.codecensus.repos
 
 /**
  * Created by kevin on 08/12/18 at 20:20
  */
-interface MainContract {
+interface ReposContract {
     interface View {
         fun bindViews()
         fun hasWriteExternalStoragePermission(): Boolean
         fun requestWriteExternalStoragePermission()
-        fun setRepoName(name: String)
-        fun setTotalFiles(count: Int)
-        fun setContributors(count: Int)
+        fun setupList(items : ArrayList<RepoItem>)
     }
 
     interface Presenter {
         fun onViewInit()
-        fun setup()
+        fun onPermissionGranted()
     }
 }

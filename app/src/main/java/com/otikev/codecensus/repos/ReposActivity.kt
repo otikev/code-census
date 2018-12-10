@@ -1,4 +1,4 @@
-package com.otikev.codecensus
+package com.otikev.codecensus.repos
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -6,24 +6,25 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.widget.TextView
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.widget.Toast
+import com.otikev.codecensus.R
 
 
-class MainActivity : AppCompatActivity(), MainContract.View {
+class ReposActivity : AppCompatActivity(), ReposContract.View {
 
     private val REQUEST_WRITE_STORAGE = 112
 
-    lateinit var presenter: MainContract.Presenter
-    lateinit var txtRepoName: TextView
-    lateinit var txtTotalFiles: TextView
-    lateinit var txtContributors: TextView
+    lateinit var presenter: ReposContract.Presenter
+    lateinit var adapter : RepoAdapter
+    lateinit var repoRecyclerView : RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_repos)
 
-        presenter = MainPresenter(this)
+        presenter = ReposPresenter(this)
         presenter.onViewInit()
     }
 
@@ -43,9 +44,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun bindViews() {
-        txtRepoName = findViewById(R.id.txtRepoName)
-        txtTotalFiles = findViewById(R.id.txtTotalFiles)
-        txtContributors = findViewById(R.id.txtContributors)
+        repoRecyclerView = findViewById(R.id.repoRecyclerView)
+        repoRecyclerView.layoutManager = LinearLayoutManager(this)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         when (requestCode) {
             REQUEST_WRITE_STORAGE -> {
                 if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    presenter.setup()
+                    presenter.onPermissionGranted()
                 } else {
                     Toast.makeText(
                         this,
@@ -65,21 +65,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         }
     }
 
-    override fun setRepoName(name: String) {
-        runOnUiThread {
-            txtRepoName.text = name
-        }
-    }
-
-    override fun setTotalFiles(count: Int) {
-        runOnUiThread {
-            txtTotalFiles.text = count.toString()
-        }
-    }
-
-    override fun setContributors(count: Int) {
-        runOnUiThread {
-            txtContributors.text = count.toString()
-        }
+    override fun setupList(items: ArrayList<RepoItem>) {
+        adapter = RepoAdapter(this, items)
+        repoRecyclerView.adapter = adapter
     }
 }
