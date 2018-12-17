@@ -15,7 +15,7 @@ class Repo {
     @PrimaryKey(autoGenerate = true)
     @NonNull
     @ColumnInfo(name = "id")
-    private lateinit var id: Integer
+    lateinit var id: Integer
 
     @NonNull
     @ColumnInfo(name = "url")
